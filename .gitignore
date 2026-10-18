@@ -53,3 +53,5 @@ models/model/model_card.json
 .idea/
 .DS_Store
 Thumbs.db
+
+!models/model/waste_classifier.joblib
