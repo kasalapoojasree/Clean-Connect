@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge, sev_badge, empty %}
+{% block title %}My Dashboard{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container">
+  <h1>Welcome, {{ user.name.split()[0] }}</h1><p>Here is a summary of your activity in {{ user.location }}.</p></div></div>
+<div class="container py-4">
+  <div class="row g-3 mb-4">
+    {% for icon, num, label in [('clipboard-data', counts.total, 'Total reports'), ('hourglass-split', counts.pending, 'Pending'), ('tools', counts.in_progress, 'In progress'), ('check2-circle', counts.resolved, 'Resolved')] %}
+    <div class="col-6 col-lg"><div class="stat-card d-flex align-items-center gap-3"><div class="ico"><i class="bi bi-{{ icon }}"></i></div>
+      <div><div class="num">{{ num }}</div><div class="lbl">{{ label }}</div></div></div></div>
+    {% endfor %}
+    <div class="col-12 col-lg"><div class="stat-card d-flex align-items-center gap-3"><div class="ico"><i class="bi bi-people"></i></div>
+      <div><div class="fw-bold text-success">{{ 'Volunteer' if volunteer else 'Not a volunteer' }}</div><div class="lbl">Volunteer status</div></div></div></div>
+  </div>
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a class="btn btn-cc" href="{{ url_for('report') }}"><i class="bi bi-plus-circle"></i> Report an Issue</a>
+    <a class="btn btn-cc-outline" href="{{ url_for('my_reports') }}"><i class="bi bi-list-check"></i> My Reports</a>
+    <a class="btn btn-cc-outline" href="{{ url_for('volunteer') }}"><i class="bi bi-people"></i> {{ 'Volunteer details' if volunteer else 'Become a Volunteer' }}</a>
+    <a class="btn btn-cc-outline" href="{{ url_for('map_page') }}"><i class="bi bi-geo-alt"></i> View Map</a>
+  </div>
+  <div class="cc-card">
+    <div class="p-3 border-bottom"><h5 class="mb-0">Recent reports</h5></div>
+    {% if recent %}
+    <div class="table-responsive"><table class="table cc-table"><thead><tr><th>ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Date</th></tr></thead><tbody>
+      {% for r in recent %}<tr><td><a href="{{ url_for('report_details', complaint_id=r.complaint_id) }}">{{ r.complaint_id }}</a></td>
+        <td>{{ r.title }}</td><td>{{ sev_badge(r.severity) }}</td><td>{{ status_badge(r.status) }}</td><td>{{ r.created_at|fdate('%d %b %Y') }}</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% else %}{{ empty('inbox', 'No reports yet', 'Spotted waste in your area? Report it in under a minute.', url_for('report'), 'Report an Issue') }}{% endif %}
+  </div>
+</div>
+{% endblock %}

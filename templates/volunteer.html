@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Volunteer{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Become a volunteer</h1><p>Give a few hours to keep your neighbourhood clean and healthy.</p></div></div>
+<div class="container py-4">
+  {% if done %}
+  <div class="cc-card pad text-center mb-4"><div class="display-4 text-success"><i class="bi bi-patch-check"></i></div>
+    <h3>Thank you, {{ done }}!</h3><p class="text-muted mb-3">You are registered as a CleanConnect volunteer. An administrator will contact you about upcoming activities.</p>
+    <a class="btn btn-cc" href="{{ url_for('index') }}">Back to home</a></div>
+  {% elif existing %}
+  <div class="alert alert-success"><i class="bi bi-check-circle"></i> You are already registered as a volunteer ({{ existing.interests }}; {{ existing.availability }}).</div>
+  {% else %}
+  <div class="row g-4"><div class="col-lg-7"><div class="cc-card pad">
+    <form method="post" class="needs-validation" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label" for="name">Name</label>
+          <input class="form-control" id="name" name="name" required maxlength="80" value="{{ form.get('name', user.name if user else '') }}"></div>
+        <div class="col-md-6"><label class="form-label" for="email">Email</label>
+          <input class="form-control" type="email" id="email" name="email" required maxlength="120" value="{{ form.get('email', user.email if user else '') }}"></div>
+        <div class="col-md-6"><label class="form-label" for="phone">Phone</label>
+          <input class="form-control" type="tel" id="phone" name="phone" required pattern="\+?\d[\d\s\-]{6,14}" value="{{ form.get('phone', user.phone if user else '') }}"></div>
+        <div class="col-md-6"><label class="form-label" for="area">Area</label>
+          <input class="form-control" id="area" name="area" required maxlength="120" value="{{ form.get('area', user.location if user else '') }}"></div>
+      </div>
+      <fieldset class="mb-3"><legend class="form-label fs-6">Activities you are interested in</legend>
+        <div class="row">{% for i in INTERESTS %}<div class="col-sm-6"><div class="form-check">
+          <input class="form-check-input" type="checkbox" name="interests" value="{{ i }}" id="int{{ loop.index }}" {{ 'checked' if i in form_interests }}>
+          <label class="form-check-label" for="int{{ loop.index }}">{{ i }}</label></div></div>{% endfor %}</div>
+        <div class="form-text">Choose at least one.</div></fieldset>
+      <div class="mb-4"><label class="form-label" for="availability">Availability</label>
+        <select class="form-select" id="availability" name="availability" required><option value="">Choose...</option>
+          {% for a in AVAILABILITY %}<option {{ 'selected' if form.get('availability') == a }}>{{ a }}</option>{% endfor %}</select></div>
+      <button class="btn btn-cc" type="submit">Register as volunteer</button>
+    </form></div></div>
+    <div class="col-lg-5"><div class="cc-card pad"><h5>What volunteers do</h5>
+      <ul class="mb-0 text-muted">{% for i in INTERESTS %}<li>{{ i }}</li>{% endfor %}</ul></div></div></div>
+  {% endif %}
+</div>
+{% endblock %}

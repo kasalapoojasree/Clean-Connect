@@ -1,0 +1,55 @@
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env
+instance/database.db
+instance/secret_key
+instance/admin_credentials.txt
+static/uploads/*
+!static/uploads/.gitkeep
+dataset/dataset-resized/
+dataset/dataset-resized.zip
+models/model/*.joblib
+models/model/*.csv
+models/model/*.txt
+models/model/model_card.json
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environments and cache
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local databases and private instance files
+instance/*.db
+instance/*.sqlite
+instance/*.sqlite3
+instance/secret_key
+instance/admin_credentials.txt
+
+# Uploaded user files and generated datasets
+static/uploads/*
+!static/uploads/.gitkeep
+dataset/dataset-resized/
+dataset/dataset-resized.zip
+
+# Generated ML artifacts
+models/model/*.joblib
+models/model/*.csv
+models/model/*.txt
+models/model/model_card.json
+
+# Editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,20 @@
+{% from '_macros.html' import status_badge, sev_badge, ai_badge, empty %}
+{% if reports %}
+<div class="table-responsive"><table class="table cc-table"><thead><tr>
+  <th>Complaint ID</th><th>User</th><th>Category</th><th>Location</th><th>Severity</th><th>AI result</th><th>Status</th><th>Date</th><th>Update / actions</th></tr></thead><tbody>
+{% for r in reports %}<tr>
+  <td><a class="fw-semibold" href="{{ url_for('report_details', complaint_id=r.complaint_id) }}">{{ r.complaint_id }}</a>{% if r.is_demo %}<span class="demo-tag">DEMO</span>{% endif %}</td>
+  <td>{{ r.user_name }}</td><td>{{ r.category }}</td><td>{{ r.location }}</td><td>{{ sev_badge(r.severity) }}</td><td>{{ ai_badge(r) }}</td>
+  <td>{{ status_badge(r.status) }}</td><td>{{ r.created_at|fdate('%d %b %Y') }}</td>
+  <td style="min-width:260px"><div class="d-flex gap-1">
+    <form method="post" action="{{ url_for('admin_update_status', rid=r.id) }}" class="d-flex gap-1 flex-grow-1">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="next" value="{{ next_url }}">
+      <select class="form-select form-select-sm" name="status" aria-label="Status for {{ r.complaint_id }}">{% for s in STATUSES %}<option {{ 'selected' if s == r.status }}>{{ s }}</option>{% endfor %}</select>
+      <button class="btn btn-sm btn-cc" type="submit">Save</button></form>
+    <a class="btn btn-sm btn-cc-outline" href="{{ url_for('report_details', complaint_id=r.complaint_id) }}" title="View" aria-label="View {{ r.complaint_id }}"><i class="bi bi-eye"></i></a>
+    <form method="post" action="{{ url_for('admin_delete_report', rid=r.id) }}" data-confirm="Delete {{ r.complaint_id }} permanently?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="next" value="{{ next_url }}">
+      <button class="btn btn-sm btn-outline-danger" type="submit" title="Delete" aria-label="Delete {{ r.complaint_id }}"><i class="bi bi-trash"></i></button></form>
+  </div></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}{{ empty('inbox', 'No reports found', 'Reports submitted by citizens will appear here.') }}{% endif %}

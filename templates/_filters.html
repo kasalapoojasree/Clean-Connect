@@ -1,0 +1,12 @@
+<form method="get" class="row g-2 align-items-end p-3 border-bottom">
+  <div class="col-12 col-md"><label class="form-label small mb-1" for="q">Search</label>
+    <input class="form-control" id="q" name="q" value="{{ args.get('q', '') }}" placeholder="{{ placeholder }}"></div>
+  <div class="col-6 col-md-auto"><label class="form-label small mb-1" for="fs">Status</label>
+    <select class="form-select" id="fs" name="status"><option value="">All</option>{% for s in STATUSES %}<option {{ 'selected' if args.get('status') == s }}>{{ s }}</option>{% endfor %}</select></div>
+  <div class="col-6 col-md-auto"><label class="form-label small mb-1" for="fc">Category</label>
+    <select class="form-select" id="fc" name="category"><option value="">All</option>{% for c in CATEGORIES %}<option {{ 'selected' if args.get('category') == c }}>{{ c }}</option>{% endfor %}</select></div>
+  {% if with_severity %}<div class="col-6 col-md-auto"><label class="form-label small mb-1" for="fv">Severity</label>
+    <select class="form-select" id="fv" name="severity"><option value="">All</option>{% for s in SEVERITIES %}<option {{ 'selected' if args.get('severity') == s }}>{{ s }}</option>{% endfor %}</select></div>{% endif %}
+  <div class="col-auto d-flex gap-2"><button class="btn btn-cc" type="submit"><i class="bi bi-search"></i> Filter</button>
+    <a class="btn btn-cc-outline" href="{{ reset_url }}">Reset</a></div>
+</form>

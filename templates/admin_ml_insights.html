@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}ML Model Insights{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div><h1><i class="bi bi-cpu"></i> ML model insights</h1><p>Model readiness, evaluation evidence and limitations for responsible AI use.</p></div>
+  <a class="btn btn-cc-outline" href="{{ url_for('admin_dashboard') }}">Back to dashboard</a>
+</div></div>
+<div class="container py-4">
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card"><div class="lbl">Runtime status</div><div class="num fs-3">{{ 'Ready' if model_ready else 'Not ready' }}</div><div class="small text-muted">{{ 'Trained model loaded successfully' if model_ready else 'Train the model before image predictions' }}</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="lbl">Hold-out accuracy</div><div class="num fs-3">{{ '%.2f%%'|format(model_card.accuracy * 100) if model_card and model_card.accuracy is defined else '—' }}</div><div class="small text-muted">Measured on held-out test images</div></div></div>
+    <div class="col-md-4"><div class="stat-card"><div class="lbl">Macro F1</div><div class="num fs-3">{{ '%.2f%%'|format(model_card.macro_f1 * 100) if model_card and model_card.macro_f1 is defined else '—' }}</div><div class="small text-muted">Treats each class equally</div></div></div>
+  </div>
+  {% if runtime_error %}<div class="alert alert-warning"><strong>Model status:</strong> {{ runtime_error }}<br>Run <code>python train_model.py</code> from the CleanConnect folder after installing requirements.</div>{% endif %}
+  {% if model_card %}
+  <div class="cc-card pad mb-4"><h5>Model card</h5>
+    <div class="row g-3">
+      <div class="col-md-6"><strong>Algorithm</strong><div>{{ model_card.model }}</div></div>
+      <div class="col-md-6"><strong>Dataset</strong><div>{{ model_card.dataset }}</div></div>
+      <div class="col-md-6"><strong>Training images</strong><div>{{ model_card.images_train }}</div></div>
+      <div class="col-md-6"><strong>Test images</strong><div>{{ model_card.images_test }}</div></div>
+      <div class="col-md-6"><strong>Balanced accuracy</strong><div>{{ '%.2f%%'|format(model_card.balanced_accuracy * 100) }}</div></div>
+      <div class="col-md-6"><strong>Training time (UTC)</strong><div>{{ model_card.trained_at_utc }}</div></div>
+    </div>
+    <hr><h6>Supported classes</h6><div class="d-flex flex-wrap gap-2">{% for label in model_card.classes %}<span class="badge text-bg-success">{{ label }}</span>{% endfor %}</div>
+    <hr><h6>Class counts in dataset</h6><div class="table-responsive"><table class="table table-sm"><thead><tr><th>Class</th><th>Images</th></tr></thead><tbody>{% for label, count in model_card.class_counts.items() %}<tr><td>{{ label }}</td><td>{{ count }}</td></tr>{% endfor %}</tbody></table></div>
+    <h6>Known limitations</h6><ul>{% for item in model_card.limitations %}<li>{{ item }}</li>{% endfor %}</ul>
+  </div>
+  {% else %}<div class="cc-card pad mb-4"><h5>No evaluation report found yet</h5><p class="mb-2">The model card appears after successful training. From a terminal in the project folder run:</p><pre class="mb-0"><code>python train_model.py</code></pre></div>{% endif %}
+  {% if report_text %}<div class="cc-card pad"><h5>Classification report</h5><pre class="small mb-0" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ report_text }}</pre></div>{% endif %}
+  <div class="alert alert-info mt-4 mb-0"><strong>Responsible AI:</strong> Model scores are estimates, not guarantees. Verify predictions before making waste collection or public-service decisions.</div>
+</div>
+{% endblock %}

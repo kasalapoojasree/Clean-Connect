@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Manage Reports{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Complaint management</h1>
+  <p>Search by complaint ID, user, location, category, status or severity, then update or remove reports.</p></div></div>
+<div class="container py-4"><div class="cc-card">
+  {% with placeholder='ID, user, location, category, status, severity...', with_severity=true, reset_url=url_for('admin_reports') %}{% include '_filters.html' %}{% endwith %}
+  {% include '_admin_table.html' %}
+</div></div>
+{% endblock %}

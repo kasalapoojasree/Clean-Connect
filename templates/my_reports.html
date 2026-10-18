@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge, sev_badge, ai_badge, empty %}
+{% block title %}My Reports{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div><h1>My reports</h1><p>Every complaint you have submitted and its current status.</p></div>
+  <a class="btn btn-cc" href="{{ url_for('report') }}"><i class="bi bi-plus-circle"></i> New report</a></div></div>
+<div class="container py-4"><div class="cc-card">
+  {% with placeholder='Search by ID, title, location...', with_severity=false, reset_url=url_for('my_reports') %}{% include '_filters.html' %}{% endwith %}
+  {% if reports %}
+  <div class="table-responsive"><table class="table cc-table"><thead><tr>
+    <th>Complaint ID</th><th>Title</th><th>Category</th><th>Date</th><th>Location</th><th>Severity</th><th>Status</th><th>AI classification</th></tr></thead><tbody>
+    {% for r in reports %}<tr>
+      <td><a class="fw-semibold" href="{{ url_for('report_details', complaint_id=r.complaint_id) }}">{{ r.complaint_id }}</a>{% if r.is_demo %}<span class="demo-tag">DEMO</span>{% endif %}</td>
+      <td>{{ r.title }}</td><td>{{ r.category }}</td><td>{{ r.created_at|fdate('%d %b %Y') }}</td><td>{{ r.location }}</td>
+      <td>{{ sev_badge(r.severity) }}</td><td>{{ status_badge(r.status) }}</td><td>{{ ai_badge(r) }}</td></tr>{% endfor %}
+  </tbody></table></div>
+  {% elif args.get('q') or args.get('status') or args.get('category') %}
+    {{ empty('search', 'No matching reports', 'Try a different search or reset the filters.') }}
+  {% else %}{{ empty('inbox', 'No reports yet', 'Your submitted complaints will appear here.', url_for('report'), 'Report an Issue') }}{% endif %}
+</div></div>
+{% endblock %}

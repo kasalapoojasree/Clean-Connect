@@ -1,0 +1,7 @@
+{% macro status_badge(s) %}<span class="cc-badge st-{{ s|replace(' ', '-') }}">{{ s }}</span>{% endmacro %}
+{% macro sev_badge(s) %}<span class="cc-badge sev-{{ s }}">{{ s }}</span>{% endmacro %}
+{% macro ai_badge(r) %}{% if r.ai_category %}<span class="cc-badge ai-badge" title="{{ 'Sample value (demo data)' if r.ai_mode == 'sample' else ('DEMO heuristic' if r.ai_mode == 'demo' else 'Trained model') }}"><i class="bi bi-cpu"></i> {{ r.ai_category }} {{ r.ai_confidence|round|int }}%</span>{% else %}<span class="text-muted small">Not classified</span>{% endif %}{% endmacro %}
+{% macro empty(icon, title, text, url=None, label=None) %}
+<div class="empty"><div class="ico"><i class="bi bi-{{ icon }}"></i></div><h5 class="mt-2">{{ title }}</h5><p>{{ text }}</p>
+{% if url %}<a class="btn btn-cc" href="{{ url }}">{{ label }}</a>{% endif %}</div>
+{% endmacro %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Complaint Map{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Complaint map</h1><p>Reports that include a location, shown on OpenStreetMap. Larger markers mean higher severity; dashed grey-green markers are resolved.</p></div></div>
+<div class="container py-4">
+  <div class="row g-2 mb-3 align-items-end">
+    <div class="col-6 col-md-3"><label class="form-label small mb-1" for="statusFilter">Status</label>
+      <select class="form-select" id="statusFilter"><option value="">All statuses</option>{% for s in STATUSES %}<option>{{ s }}</option>{% endfor %}</select></div>
+    <div class="col-6 col-md-3"><label class="form-label small mb-1" for="sevFilter">Severity</label>
+      <select class="form-select" id="sevFilter"><option value="">All severities</option>{% for s in SEVERITIES %}<option>{{ s }}</option>{% endfor %}</select></div>
+    <div class="col-md-6 text-md-end text-muted small" id="mapStatus" aria-live="polite">Loading...</div>
+  </div>
+  <div id="map" role="application" aria-label="Map of complaints"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>document.addEventListener('DOMContentLoaded', initMainMap);</script>
+{% endblock %}

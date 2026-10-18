@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import empty %}
+{% block title %}Volunteers{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Volunteers</h1><p>{{ volunteers|length }} registered volunteer{{ '' if volunteers|length == 1 else 's' }}.</p></div></div>
+<div class="container py-4"><div class="cc-card">
+{% if volunteers %}
+<div class="table-responsive"><table class="table cc-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Area</th><th>Interests</th><th>Availability</th><th>Joined</th><th></th></tr></thead><tbody>
+{% for v in volunteers %}<tr><td>{{ v.name }}{% if v.is_demo %}<span class="demo-tag">DEMO</span>{% endif %}</td><td>{{ v.email }}</td><td>{{ v.phone }}</td><td>{{ v.area }}</td>
+  <td>{{ v.interests }}</td><td>{{ v.availability }}</td><td>{{ v.created_at|fdate('%d %b %Y') }}</td>
+  <td><form method="post" action="{{ url_for('admin_delete_volunteer', vid=v.id) }}" data-confirm="Remove {{ v.name }} from volunteers?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Remove {{ v.name }}"><i class="bi bi-trash"></i></button></form></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}{{ empty('people', 'No volunteers yet', 'Volunteer sign-ups will appear here.') }}{% endif %}
+</div></div>
+{% endblock %}

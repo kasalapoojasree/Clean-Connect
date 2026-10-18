@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% from '_macros.html' import status_badge, sev_badge %}
+{% block title %}{{ r.complaint_id }}{% endblock %}
+{% block head %}{% if r.latitude is not none %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endif %}{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+  <div><h1>{{ r.complaint_id }}{% if r.is_demo %}<span class="demo-tag">DEMO</span>{% endif %}</h1><p>{{ r.title }}</p></div>
+  <a class="btn btn-cc-outline" href="{{ url_for('admin_reports') if is_admin else url_for('my_reports') }}"><i class="bi bi-arrow-left"></i> Back to reports</a></div></div>
+<div class="container py-4">
+  <div class="cc-card pad mb-4">
+    <h5 class="mb-0">Progress: {{ status_badge(r.status) }}</h5>
+    <div class="tracker" role="list" aria-label="Complaint progress">
+      <div class="fill" style="width: calc(80% * {{ step / (STATUSES|length - 1) }})"></div>
+      {% for s in STATUSES %}<div class="step {{ 'done' if loop.index0 <= step }} {{ 'current' if loop.index0 == step }}" role="listitem">
+        <div class="dot">{% if loop.index0 < step or r.status == 'Resolved' and loop.index0 == step %}<i class="bi bi-check-lg"></i>{% else %}{{ loop.index }}{% endif %}</div>{{ s }}</div>{% endfor %}
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="cc-card pad mb-4">
+        {% if r.image_path %}<img class="report-img mb-3" src="{{ url_for('static', filename='uploads/' ~ r.image_path) }}" alt="Photo submitted with {{ r.complaint_id }}">
+        {% else %}<p class="text-muted"><i class="bi bi-image"></i> No photo was uploaded with this complaint.</p>{% endif %}
+        <h5>Description</h5><p style="white-space:pre-line">{{ r.description }}</p>
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Category</dt><dd class="col-sm-8">{{ r.category }}</dd>
+          <dt class="col-sm-4">Severity</dt><dd class="col-sm-8">{{ sev_badge(r.severity) }}</dd>
+          <dt class="col-sm-4">Location</dt><dd class="col-sm-8">{{ r.location }}{% if r.latitude is not none %}<br><small class="text-muted">{{ r.latitude }}, {{ r.longitude }}</small>{% endif %}</dd>
+          <dt class="col-sm-4">Incident time</dt><dd class="col-sm-8">{{ r.incident_time|fdate }}</dd>
+          <dt class="col-sm-4">Submitted</dt><dd class="col-sm-8">{{ r.created_at|fdate }}</dd>
+          <dt class="col-sm-4">Last updated</dt><dd class="col-sm-8">{{ r.updated_at|fdate }}</dd>
+          {% if is_admin %}<dt class="col-sm-4">Reported by</dt><dd class="col-sm-8">{{ r.user_name }} ({{ r.user_email }}, {{ r.user_phone }})</dd>{% endif %}
+        </dl>
+      </div>
+      {% if r.latitude is not none %}<div class="cc-card pad"><h5>Location on map</h5><div id="map" style="height:300px"></div></div>{% endif %}
+    </div>
+    <div class="col-lg-5">
+      <div class="cc-card pad mb-4">
+        <h5><i class="bi bi-cpu"></i> AI waste classification</h5>
+        {% if r.ai_category %}
+          <div class="ai-box"><div class="fs-4 fw-bold text-success">{{ r.ai_category }}</div>
+            <div class="conf-bar my-2"><span style="width: {{ r.ai_confidence }}%"></span></div>
+            <div>Confidence: <strong>{{ r.ai_confidence|round(1) }}%</strong></div>
+            <div class="small mt-2">Source:
+              {% if r.ai_mode == 'trained' %}<strong>trained Random Forest model</strong>{% else %}{{ r.ai_mode or 'unknown' }}{% endif %}</div></div>
+          <p class="small text-muted mt-2 mb-0">AI classification is an assistive prediction and may not always be accurate.</p>
+        {% else %}<p class="text-muted mb-0">No photo was uploaded, so no AI classification is available.</p>{% endif %}
+      </div>
+      {% if is_admin %}
+      <div class="cc-card pad mb-4"><h5>Admin actions</h5>
+        <form method="post" action="{{ url_for('admin_update_status', rid=r.id) }}" class="d-flex gap-2 mb-3">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="next" value="{{ request.path }}">
+          <select class="form-select" name="status" aria-label="New status">{% for s in STATUSES %}<option {{ 'selected' if s == r.status }}>{{ s }}</option>{% endfor %}</select>
+          <button class="btn btn-cc" type="submit">Update</button></form>
+        <form method="post" action="{{ url_for('admin_delete_report', rid=r.id) }}" data-confirm="Delete {{ r.complaint_id }} permanently? This cannot be undone.">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="next" value="{{ url_for('admin_reports') }}">
+          <button class="btn btn-outline-danger btn-sm" type="submit"><i class="bi bi-trash"></i> Delete invalid report</button></form>
+      </div>{% endif %}
+      <div class="cc-card pad"><h5>Status history</h5>
+        <ul class="list-unstyled mb-0">{% for h in history|reverse %}
+          <li class="d-flex justify-content-between py-2 {{ 'border-top' if not loop.first }}"><span>{{ status_badge(h.status) }}</span>
+            <span class="small text-muted text-end">{{ h.changed_at|fdate }}<br>by {{ h.changed_by.split(':')[1] if ':' in h.changed_by else h.changed_by }}</span></li>{% endfor %}</ul></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}{% if r.latitude is not none %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([{{ r.latitude }}, {{ r.longitude }}], 16);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; OpenStreetMap contributors', maxZoom: 19}).addTo(map);
+L.marker([{{ r.latitude }}, {{ r.longitude }}]).addTo(map).bindPopup({{ r.complaint_id|tojson }}).openPopup();
+</script>{% endif %}{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Waste Awareness{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Waste awareness</h1><p>Small habits at home make a big difference to the whole community.</p></div></div>
+<div class="container py-4">
+  <h2 class="h4 mb-3">Waste segregation</h2>
+  <div class="row g-3 mb-5">
+    {% for color, icon, title, text, eg in [
+      ('#2e9d63', 'apple', 'Wet waste', 'Biodegradable kitchen and garden waste. Compost it or send it to wet-waste collection.', 'Vegetable peels, leftover food, leaves, flowers'),
+      ('#2f6fd6', 'newspaper', 'Dry waste', 'Clean, dry material that is not biodegradable. Keep it separate from wet waste so it stays reusable.', 'Paper, cardboard, wrappers, cloth'),
+      ('#f2b705', 'recycle', 'Recyclable waste', 'Materials that can be processed into new products. Rinse and dry before handing over.', 'Plastic bottles, glass jars, metal cans, tetra packs'),
+      ('#d62828', 'exclamation-triangle', 'Hazardous waste', 'Harmful to people and the environment. Never mix it with normal garbage; use special collection points.', 'Batteries, bulbs, medicines, paint, e-waste')] %}
+    <div class="col-sm-6 col-lg-3"><div class="cc-card pad h-100" style="border-top:5px solid {{ color }}">
+      <div class="awareness-icon mb-2"><i class="bi bi-{{ icon }}"></i></div><h5>{{ title }}</h5>
+      <p class="small text-muted">{{ text }}</p><p class="small mb-0"><strong>Examples:</strong> {{ eg }}</p></div></div>
+    {% endfor %}
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6"><div class="cc-card pad h-100"><div class="awareness-icon"><i class="bi bi-bag-x"></i></div>
+      <h3 class="h5 mt-2">Plastic pollution</h3>
+      <p class="text-muted">Plastic breaks into tiny pieces but never fully disappears. It blocks drains, harms animals that swallow it, and ends up in rivers and lakes.</p>
+      <h6>What you can do</h6><ul class="text-muted mb-0"><li>Carry a cloth bag and a reusable bottle.</li><li>Refuse single-use cutlery, straws and thin carry bags.</li><li>Keep plastic dry and clean so it can be recycled.</li><li>Never burn plastic; it releases toxic fumes.</li></ul></div></div>
+    <div class="col-lg-6"><div class="cc-card pad h-100"><div class="awareness-icon"><i class="bi bi-droplet"></i></div>
+      <h3 class="h5 mt-2">Clean water bodies</h3>
+      <p class="text-muted">Lakes and ponds recharge groundwater, cool the surrounding area and support fish and birds. Dumped waste and sewage make the water unsafe and cause bad smells and mosquitoes.</p>
+      <h6>What you can do</h6><ul class="text-muted mb-0"><li>Do not throw puja waste, plastic or debris into water.</li><li>Report dumping near lakes using CleanConnect.</li><li>Join a water-body cleaning drive as a volunteer.</li><li>Keep drains free of waste so it does not wash into lakes.</li></ul></div></div>
+    <div class="col-12"><div class="cc-card pad"><div class="awareness-icon"><i class="bi bi-people"></i></div>
+      <h3 class="h5 mt-2">Community responsibility</h3>
+      <p class="text-muted">Clean streets are a shared effort. Authorities collect and process waste, but citizens decide how much waste is created and whether it is separated.</p>
+      <div class="row g-3">
+        {% for t, x in [('Segregate at source', 'Use separate bins for wet and dry waste at home.'), ('Report, do not ignore', 'A photo and location lets the right team respond.'), ('Volunteer', 'Join drives, campaigns and tree plantation activities.'), ('Educate others', 'Share what you learn with family, neighbours and schools.')] %}
+        <div class="col-sm-6 col-lg-3"><div class="p-3 rounded-3 h-100" style="background:var(--cc-mint)"><strong>{{ t }}</strong><div class="small text-muted">{{ x }}</div></div></div>{% endfor %}
+      </div>
+      <div class="mt-3 d-flex gap-2 flex-wrap"><a class="btn btn-cc" href="{{ url_for('report') }}">Report an issue</a><a class="btn btn-cc-outline" href="{{ url_for('volunteer') }}">Become a volunteer</a></div></div></div>
+  </div>
+</div>
+{% endblock %}

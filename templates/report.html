@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Report an Issue{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+{% block content %}
+<div class="page-head"><div class="container"><h1>Report a cleanliness issue</h1>
+  <p>Add a photo and location so the right team can act quickly.</p></div></div>
+<div class="container py-4">
+<form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="row g-4">
+    <div class="col-lg-7"><div class="cc-card pad">
+      <div class="mb-3"><label class="form-label" for="title">Complaint title</label>
+        <input class="form-control" id="title" name="title" required minlength="3" maxlength="120" value="{{ form.get('title', '') }}" placeholder="e.g. Overflowing bin near market"></div>
+      <div class="mb-3"><label class="form-label" for="description">Description</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required minlength="10" maxlength="2000" placeholder="What is the problem and how long has it been there?">{{ form.get('description', '') }}</textarea></div>
+      <div class="row g-3 mb-3">
+        <div class="col-md-6"><label class="form-label" for="category">Problem category</label>
+          <select class="form-select" id="category" name="category" required><option value="">Choose...</option>
+            {% for c in CATEGORIES %}<option {{ 'selected' if form.get('category') == c }}>{{ c }}</option>{% endfor %}</select></div>
+        <div class="col-md-6"><label class="form-label" for="severity">Severity</label>
+          <select class="form-select" id="severity" name="severity" required><option value="">Choose...</option>
+            {% for s in SEVERITIES %}<option {{ 'selected' if form.get('severity') == s }}>{{ s }}</option>{% endfor %}</select></div>
+      </div>
+      <div class="row g-3">
+        <div class="col-md-7"><label class="form-label" for="location">Location / address</label>
+          <input class="form-control" id="location" name="location" required minlength="3" maxlength="200" value="{{ form.get('location', '') }}" placeholder="Street, landmark, area"></div>
+        <div class="col-md-5"><label class="form-label" for="incident_time">Date and time</label>
+          <input class="form-control" type="datetime-local" id="incident_time" name="incident_time" max="{{ now_local }}" value="{{ form.get('incident_time', now_local) }}"></div>
+      </div>
+    </div></div>
+
+    <div class="col-lg-5">
+      <div class="cc-card pad mb-4">
+        <label class="form-label" for="photo">Photo of the waste (JPG or PNG, max 5 MB)</label>
+        <input class="form-control" type="file" id="photo" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png">
+        <img id="photoPreview" class="report-img mt-3 d-none" alt="Selected photo preview">
+        <div id="aiPreview" class="ai-box mt-3 d-none" aria-live="polite"></div>
+        <div class="form-text">Optional, but a photo lets the AI suggest the waste type and helps the team.</div>
+      </div>
+      <div class="cc-card pad">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <label class="form-label mb-0">Pin the location (optional)</label>
+          <button type="button" class="btn btn-sm btn-cc-outline" id="geoBtn"><i class="bi bi-crosshair"></i> Use my location</button></div>
+        <div id="pickerMap" class="mb-3"></div>
+        <div class="row g-2">
+          <div class="col"><input class="form-control" id="latitude" name="latitude" placeholder="Latitude" inputmode="decimal" aria-label="Latitude" value="{{ form.get('latitude', '') }}"></div>
+          <div class="col"><input class="form-control" id="longitude" name="longitude" placeholder="Longitude" inputmode="decimal" aria-label="Longitude" value="{{ form.get('longitude', '') }}"></div>
+        </div>
+        <div class="form-text">Click the map, use your location, or type coordinates. Pinned reports appear on the public map.</div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-4"><button class="btn btn-cc btn-lg" type="submit"><i class="bi bi-send"></i> Submit complaint</button></div>
+</form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script>document.addEventListener('DOMContentLoaded', initPickerMap);</script>
+{% endblock %}

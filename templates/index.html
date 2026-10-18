@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Together for a Cleaner Tomorrow{% endblock %}
+{% block content %}
+<section class="hero">
+  <i class="bi bi-flower1 leaf-art d-none d-md-block" aria-hidden="true"></i>
+  <div class="container position-relative">
+    <span class="tagline">Connect. Report. Clean. Transform.</span>
+    <h1>Together for a<br>Cleaner Tomorrow</h1>
+    <p class="lead mt-3">CleanConnect connects citizens, volunteers and administrators to report, track and resolve cleanliness and waste problems in the community.</p>
+    <div class="d-flex flex-wrap gap-2 mt-4">
+      <a href="{{ url_for('report') }}" class="btn btn-light-pill btn-lg"><i class="bi bi-camera"></i> Report an Issue</a>
+      <a href="{{ url_for('volunteer') }}" class="btn btn-ghost-pill btn-lg"><i class="bi bi-people"></i> Become a Volunteer</a>
+    </div>
+  </div>
+</section>
+
+<section class="container stats-wrap">
+  <div class="row g-3">
+    {% for icon, num, label in [('clipboard-data', total, 'Total Reports'), ('check2-circle', resolved, 'Resolved Reports'), ('people', volunteers, 'Active Volunteers'), ('recycle', classes, 'Waste Categories (AI)')] %}
+    <div class="col-6 col-lg-3"><div class="stat-card d-flex align-items-center gap-3">
+      <div class="ico"><i class="bi bi-{{ icon }}"></i></div>
+      <div><div class="num">{{ num }}</div><div class="lbl">{{ label }}</div></div></div></div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container py-5">
+  <h2 class="section-title text-center">How CleanConnect helps</h2>
+  <p class="section-sub text-center mb-4">Four ways to take part. Select a card to get started.</p>
+  <div class="row g-3">
+    {% for icon, title, text, url in [
+      ('camera', 'Report Waste', 'Photograph a problem, pin its location and let AI suggest the waste type.', url_for('report')),
+      ('people', 'Volunteer', 'Join cleanliness drives, awareness campaigns and water-body cleaning.', url_for('volunteer')),
+      ('geo-alt', 'Track Complaints', 'Follow every complaint from Submitted to Resolved, and see them on the map.', url_for('my_reports')),
+      ('book', 'Waste Awareness', 'Learn segregation, plastic reduction and how to protect water bodies.', url_for('awareness'))] %}
+    <div class="col-sm-6 col-lg-3"><a class="cc-card action-card" href="{{ url }}">
+      <div class="ico"><i class="bi bi-{{ icon }}"></i></div><h5>{{ title }}</h5><p class="text-muted mb-0 small">{{ text }}</p></a></div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container pb-4" id="about">
+  <div class="cc-card pad">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-6"><h2 class="section-title">About CleanConnect</h2>
+        <p class="text-muted">CleanConnect is a community platform where citizens report cleanliness problems with a photo and location, volunteers sign up for local activities, and administrators manage complaints from a single dashboard with a live map and analytics.</p>
+        <p class="text-muted mb-0">An image classifier suggests the waste type for each photo. It is an assistive prediction only, and each result states whether it came from a trained model or from the built-in demo fallback.</p></div>
+      <div class="col-lg-6"><ol class="list-group list-group-numbered">
+        <li class="list-group-item">A citizen reports an issue with a photo and location.</li>
+        <li class="list-group-item">The AI module suggests the waste category.</li>
+        <li class="list-group-item">An administrator reviews, assigns and resolves it.</li>
+        <li class="list-group-item">The citizen follows progress; the map and charts update.</li></ol></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
